@@ -1,0 +1,88 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.40">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.92">
+    <script>
+    pipeline {
+        agent any
+        environment {
+            AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')   // Fetch from Jenkins credentials
+            AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+            TF_VERSION = '1.5.0'  // Define Terraform version to use
+            WORKSPACE_DIR = '/var/lib/jenkins/workspace/Terraform-Infra'
+            TF_DIR = '/home/siddharth312/Terraform/project_with_cicd'
+        }
+        stages {
+            stage('Install Terraform') {
+                steps {
+                    sh '''
+                    wget https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+                    unzip terraform_${TF_VERSION}_linux_amd64.zip
+                    sudo -S mv terraform /usr/local/bin
+                    terraform --version
+                    '''
+                }
+            }
+            stage('Copy Files of Terraform to Workspace') {
+                steps {
+                    sh '''
+                    echo $(pwd)
+                    cp ${TF_DIR}/* ${WORKSPACE_DIR}
+                    '''
+                }
+            }
+            stage('Initialize Terraform') {
+                steps {
+                    script {
+                        sh 'terraform init'
+                    }
+                }
+            }
+            stage('Terraform Validate') {
+                steps {
+                    script {
+                        sh 'terraform validate'
+                    }
+                }
+            }
+            stage('Terraform Plan') {
+                steps {
+                    script {
+                        sh 'terraform plan -out=tfplan'
+                    }
+                }
+            }
+            stage('Manual Approval for Apply') {
+                steps {
+                    script {
+                        input message: 'Do you want to apply the changes?', ok: 'Apply'
+                    }
+                }
+            }
+            stage('Terraform Apply') {
+                steps {
+                    script {
+                        sh 'terraform apply -auto-approve tfplan'
+                    }
+                }
+            }
+        }
+        post {
+            always {
+                echo 'Cleaning up workspace'
+                cleanWs()
+            }
+            failure {
+                echo 'Pipeline failed!'
+            }
+        }
+    }
+    </script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

@@ -1,0 +1,53 @@
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+28fbe16731d047c6bd5278a38e32e8b4
+
+wget http://localhost:8080/jnlpJars/jenkins-cli.jar
+
+java -jar jenkins-cli.jar -s http://localhost:8080/ -auth @.jenkins-cli who-am-i
+Authenticated as: sid312
+Authorities:
+  authenticated
+java -jar jenkins-cli.jar -s http://localhost:8080/ -auth @.jenkins-cli install-plugin terraform
+Installing terraform from update center
+
+
+java -jar jenkins-cli.jar -s http://localhost:8080/ safe-restart
+
+
+CRUMB=$(curl -u 'sid312:11af0dc394bf6b76009f8bd53a71bd3daa' 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
+Jenkins-Crumb:4370665d7985ba593296cce89fc385e23ee3575d45c97a323c76588e3817fd41
+
+curl -X POST 'http://localhost:8080/credentials/store/system/domain/_/createCredentials'      --user 'sid312:11af0dc394bf6b76009f8bd53a71bd3daa'      --header "$CRUMB"      --data-binary @aws-access-key.xml      --header 'Content-Type: application/xml'
+
+curl -X POST 'http://localhost:8080/credentials/store/system/domain/_/createCredentials'      --user 'sid312:11af0dc394bf6b76009f8bd53a71bd3daa'      --header "$CRUMB"      --data-binary @aws-secret-key.xml      --header 'Content-Type: application/xml'
+
+java -jar jenkins-cli.jar -s http://localhost:8080/ -auth 'sid312:11af0dc394bf6b76009f8bd53a71bd3daa' update-job Terraform-Infra < job-config.xml
+java -jar jenkins-cli.jar -s http://localhost:8080/ -auth 'sid312:11af0dc394bf6b76009f8bd53a71bd3daa' build Terraform-Infra
+java -jar jenkins-cli.jar -s http://localhost:8080/ -auth 'sid312:11af0dc394bf6b76009f8bd53a71bd3daa' console -f Terraform-Infra
+
+3. Add Jenkins User to the Same Group
+
+If you don't want to change ownership, you can add the Jenkins user to the same group that owns the directory and adjust the group permissions accordingly.
+
+bash
+
+sudo usermod -aG <group> jenkins
+
+Replace <group> with the group that owns the directory. You can check the directory group using:
+
+bash
+
+ls -l /home/siddharth312/Terraform/project_with_cicd
+
+After adding Jenkins to the group, ensure that the group has read/write access:
+
+bash
+
+sudo chmod -R 775 /home/siddharth312/Terraform/project_with_cicd
+
+These steps will allow Jenkins to copy files from any directory without needing sudo
+
+
+
+
+

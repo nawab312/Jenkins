@@ -1,0 +1,4 @@
+#ignore access keys of AWS
+aws-access-key.xml
+aws-secret-key.xml
+

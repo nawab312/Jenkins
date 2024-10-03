@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')   // Fetch from Jenkins credentials
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        TF_VERSION = '1.5.0'  // Define Terraform version to use
+    }
+    stages {
+        stage('Install Terraform') {
+            steps {
+                sh '''
+                # Download and install Terraform
+                wget https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+                unzip terraform_${TF_VERSION}_linux_amd64.zip
+                sudo mv terraform /usr/local/bin/
+                terraform --version
+                '''
+            }
+        }
+        stage('Initialize Terraform') {
+            steps {
+                script {
+                    sh 'terraform init'
+                }
+            }
+        }
+        stage('Terraform Validate') {
+            steps {
+                script {
+                    sh 'terraform validate'
+                }
+            }
+        }
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+        }
+        stage('Manual Approval for Apply') {
+            steps {
+                script {
+                    // Request manual approval before applying changes
+                    input message: 'Do you want to apply the changes?', ok: 'Apply'
+                }
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    sh 'terraform apply -auto-approve tfplan'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Cleaning up workspace'
+            cleanWs()  // Cleans workspace after the pipeline completes
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
