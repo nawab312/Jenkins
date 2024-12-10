@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    stages {
+        stage('Clone Repo and Change Directory') {
+            steps {
+                git branch: 'main', url: 'https://github.com/nawab312/Machine-Learning.git'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh ''' 
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install pandas scikit-learn
+                '''
+            }
+        }
+        stage('Linting') {
+            steps {
+                sh '''
+                . venv/bin/activate
+                pip install flake8
+                flake8 Models/Model1.py
+                '''
+            }
+        }
+        stage('Run ML Script') {
+            steps {
+                sh 'python3 Models/Model1.py'              
+            }
+        }
+    }
+}
