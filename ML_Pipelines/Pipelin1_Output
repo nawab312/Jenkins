@@ -1,0 +1,131 @@
+Started by user unknown or anonymous
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins
+ in /var/lib/jenkins/workspace/ML CI
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone Repo and Change Directory)
+[Pipeline] git
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/ML CI/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/nawab312/Machine-Learning.git # timeout=10
+Fetching upstream changes from https://github.com/nawab312/Machine-Learning.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.0'
+ > git fetch --tags --force --progress -- https://github.com/nawab312/Machine-Learning.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision d17098af4b404fd563512792eb200d0e60937395 (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f d17098af4b404fd563512792eb200d0e60937395 # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D main # timeout=10
+ > git checkout -b main d17098af4b404fd563512792eb200d0e60937395 # timeout=10
+Commit message: "Update Model1.py"
+ > git rev-list --no-walk 868b6c530c68f61609b9a2ba2f4f220f1062a5d6 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Check inside)
+[Pipeline] sh
++ ls -lart
+total 20
+drwxr-xr-x 21 jenkins jenkins 4096 Dec 10 20:22 ..
+drwxr-xr-x  5 jenkins jenkins 4096 Dec 10 20:22 .
+drwxr-xr-x  5 jenkins jenkins 4096 Dec 10 20:22 venv
+drwxr-xr-x  2 jenkins jenkins 4096 Dec 10 22:16 Models
+drwxr-xr-x  8 jenkins jenkins 4096 Dec 10 22:16 .git
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Install Dependencies)
+[Pipeline] sh
++ python3 -m venv venv
++ . venv/bin/activate
++ deactivate nondestructive
++ [ -n  ]
++ [ -n  ]
++ hash -r
++ [ -n  ]
++ unset VIRTUAL_ENV
++ unset VIRTUAL_ENV_PROMPT
++ [ ! nondestructive = nondestructive ]
++ [  = cygwin ]
++ [  = msys ]
++ export VIRTUAL_ENV=/var/lib/jenkins/workspace/ML CI/venv
++ _OLD_VIRTUAL_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/snap/bin
++ PATH=/var/lib/jenkins/workspace/ML CI/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/snap/bin
++ export PATH
++ [ -n  ]
++ [ -z  ]
++ _OLD_VIRTUAL_PS1=$ 
++ PS1=(venv) $ 
++ export PS1
++ VIRTUAL_ENV_PROMPT=(venv) 
++ export VIRTUAL_ENV_PROMPT
++ hash -r
++ pip install --upgrade pip
+Requirement already satisfied: pip in ./venv/lib/python3.12/site-packages (24.3.1)
+
++ pip install pandas scikit-learn
+Requirement already satisfied: pandas in ./venv/lib/python3.12/site-packages (2.2.3)
+Requirement already satisfied: scikit-learn in ./venv/lib/python3.12/site-packages (1.6.0)
+Requirement already satisfied: numpy>=1.26.0 in ./venv/lib/python3.12/site-packages (from pandas) (2.2.0)
+Requirement already satisfied: python-dateutil>=2.8.2 in ./venv/lib/python3.12/site-packages (from pandas) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in ./venv/lib/python3.12/site-packages (from pandas) (2024.2)
+Requirement already satisfied: tzdata>=2022.7 in ./venv/lib/python3.12/site-packages (from pandas) (2024.2)
+Requirement already satisfied: scipy>=1.6.0 in ./venv/lib/python3.12/site-packages (from scikit-learn) (1.14.1)
+Requirement already satisfied: joblib>=1.2.0 in ./venv/lib/python3.12/site-packages (from scikit-learn) (1.4.2)
+Requirement already satisfied: threadpoolctl>=3.1.0 in ./venv/lib/python3.12/site-packages (from scikit-learn) (3.5.0)
+Requirement already satisfied: six>=1.5 in ./venv/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas) (1.17.0)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Linting)
+[Pipeline] sh
+
++ . venv/bin/activate
++ deactivate nondestructive
++ [ -n  ]
++ [ -n  ]
++ hash -r
++ [ -n  ]
++ unset VIRTUAL_ENV
++ unset VIRTUAL_ENV_PROMPT
++ [ ! nondestructive = nondestructive ]
++ [  = cygwin ]
++ [  = msys ]
++ export VIRTUAL_ENV=/var/lib/jenkins/workspace/ML CI/venv
++ _OLD_VIRTUAL_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/snap/bin
++ PATH=/var/lib/jenkins/workspace/ML CI/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/snap/bin
++ export PATH
++ [ -n  ]
++ [ -z  ]
++ _OLD_VIRTUAL_PS1=$ 
++ PS1=(venv) $ 
++ export PS1
++ VIRTUAL_ENV_PROMPT=(venv) 
++ export VIRTUAL_ENV_PROMPT
++ hash -r
++ pip install flake8
+Requirement already satisfied: flake8 in ./venv/lib/python3.12/site-packages (7.1.1)
+Requirement already satisfied: mccabe<0.8.0,>=0.7.0 in ./venv/lib/python3.12/site-packages (from flake8) (0.7.0)
+Requirement already satisfied: pycodestyle<2.13.0,>=2.12.0 in ./venv/lib/python3.12/site-packages (from flake8) (2.12.1)
+Requirement already satisfied: pyflakes<3.3.0,>=3.2.0 in ./venv/lib/python3.12/site-packages (from flake8) (3.2.0)
++ flake8 Models/Model1.py
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run ML Script)
+[Pipeline] sh
++ python3 Models/Model1.py
+
+Model Trained Successfully
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
