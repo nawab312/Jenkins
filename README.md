@@ -33,8 +33,5 @@ Before using this repository, you need to have the following installed:
 
 ## Installation
 
-To set up the Jenkins pipeline configurations on your system, follow these steps:
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/jenkins-repository.git
+To set up the Jenkins pipeline configurations on your system, follow the steps provided here:
+https://github.com/nawab312/DevOpsToolBox/blob/main/Jenkins
