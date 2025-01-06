@@ -7,12 +7,8 @@ This repository contains configurations and scripts to set up and manage Jenkins
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-- [Configuration](#configuration)
-- [Pipeline Setup](#pipeline-setup)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+
+
 
 ## Introduction
 
