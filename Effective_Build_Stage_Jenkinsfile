@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    environment {
+        // Environment variables can be set here if needed
+        NODE_HOME = tool name: 'nodejs', type: 'NodeJS' // Define Node.js tool installation path
+    }
+
+    stages {
+        // Stage 1: Checkout the code from GIT
+        stage('Checkout') {
+            steps {
+                echo "Checkout the latest code from Git Repo"
+                git branch: 'main', url: 'https://github.com/your/repo.git'
+            }
+        }
+
+        // Stage 2: Build: Install Dependencies and Build this Project
+        stage('Build') {
+            steps {
+                echo "Starting Build Process"
+                sh 'npm install' // Install dependencies using npm
+                sh 'npm run build' // Run the Build Script (example: Webpack, Rollup)
+            }
+            // Store Build Artifacts for use in subsequent stages
+            archiveArtifacts allowEmptyArchive: true, artifacts: 'dist/**/*', fingerprint: true
+        }
+
+        // Stage 3: Linting: Static Code Analysis(eg: ESLint)
+        stage('Lint') {
+            steps {
+                echo "Running linting to ensure code quality..."
+                sh 'npm run lint' // Run linter (e.g., ESLint) to check code style and errors
+            }
+        }
+
+        // Stage 4: Test: Run Unit Tests:
+        stage('Test') {
+            steps {
+                echo "Running unit tests"
+                sh 'npm test' //Run tests with a testing framework (e.g., Jest, Mocha)
+            }
+        }
+
+        // Stage 5: Deploy: Deployment (eg: For a NodeJS App)
+        stage('Deploy') {
+            steps {
+                echo "Deploying an Application"
+                sh './deploy.sh' //Custom Deployment Script (eg: Pushing to Server)
+            }
+        }
+    }
+
+    post {
+        // Notify on Build Result(Success or Failure)
+        success {
+            echo "Build was Successful"
+        }
+        failure {
+            echo "Build was Failure"
+        }
+        always {
+            cleanWs() // Clean Workspace after Build Completes
+        }
+    }
+}
