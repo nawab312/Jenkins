@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    environment {
+        STAGING_API_URL = 'https://staging.api.yourapp.com'
+        PROD_API_URL = 'https://prod.api.yourapp.com'
+        DB_PASSWORD = credentials('db-password')
+    }
+    stages {
+        stage('Build') {
+            steps {
+                echo "Building the application..."
+                // Use environment variable in the build process
+                sh 'mvn clean package'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                // Pass environment variable for tests
+                sh 'mvn test -Dapi.url=${STAGING_API_URL}'
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                echo "Deploying to Staging..."
+                // Use environment variable for deployment
+                sh "kubectl apply -f deployment-staging.yaml --set apiUrl=${STAGING_API_URL}"
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                echo "Deploying to Production..."
+                // Use different environment-specific API URL for production deployment
+                sh "kubectl apply -f deployment-prod.yaml --set apiUrl=${PROD_API_URL}"
+            }
+        }
+    }
+}
