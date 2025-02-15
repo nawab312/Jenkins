@@ -2,9 +2,9 @@ const request = require('supertest');
 const app = require('../app'); // Assuming app is exported from app.js
 let server;
 
-beforeAll(() => {
-  // Start the server before tests
-  server = app.listen(0,done); // Make sure Jest waits until the server is started
+beforeAll((done) => {
+  // Start the server before tests and pass done to wait for server to start
+  server = app.listen(0, done); // Make sure Jest waits until the server is started
 });
 
 afterAll((done) => {
