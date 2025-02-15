@@ -4,12 +4,14 @@ let server;
 
 beforeAll((done) => {
   // Start the server before tests and pass done to wait for server to start
-  server = app.listen(0, done); // Make sure Jest waits until the server is started
+  server = app.listen(0, () => done());  // Ensure Jest waits for server startup
 });
 
-afterAll((done) => {
+afterAll(async () => {
   // Ensure the server is closed after the tests
-  server.close(done);
+  if (server) {
+    await server.close();
+  }
 });
 
 describe('GET /', () => {
