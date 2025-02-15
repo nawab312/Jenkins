@@ -5,12 +5,12 @@ let server;  // Declare server variable to manage the lifecycle of the server
 
 beforeAll(() => {
   // Start the server before running tests
-  server = app.listen(3000);
+  //server = app.listen(3000);
 });
 
 afterAll(() => {
   // Close the server after tests are finished
-  server.close();
+  //server.close();
 });
 
 describe('GET /', () => {
