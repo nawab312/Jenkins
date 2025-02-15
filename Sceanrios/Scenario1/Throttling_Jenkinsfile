@@ -1,0 +1,28 @@
+pipeline {
+    agent none  // Do not run the pipeline on the master node.
+
+    stages {
+        stage('Linux Build') {
+            agent {
+                label 'linux'  // Runs on any available node with the 'linux' label
+            }
+            options {
+                throttle([mode: 'all', limit: 2])  // Limit the total number of concurrent builds to 2 across all linux nodes
+            }
+            steps {
+                echo 'Building on a Linux node...'
+                sh 'echo "Building Linux part of the pipeline"'
+            }
+        }
+
+        stage('Windows Build') {
+            agent {
+                label 'windows'  // Runs only on a node with the 'windows' label
+            }
+            steps {
+                echo 'Building on a Windows node...'
+                bat 'echo "Building Windows part of the pipeline"'
+            }
+        }
+    }
+}
