@@ -1,4 +1,4 @@
-##Project Description
+## Project Description 
 This project is a simple Node.js application built using Express.js for handling HTTP requests. The application has a single route (GET /) that returns a basic message: "Hello, Jenkins!". This is a simple demonstration of building a web server with Node.js and testing it with automated tests.
 
 In addition to the basic Node.js application, the project integrates a Jenkins pipeline for Continuous Integration (CI) and Continuous Deployment (CD). The Jenkins pipeline automates various stages of the software development lifecycle, including:
