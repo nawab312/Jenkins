@@ -4,7 +4,7 @@ let server;
 
 beforeAll(() => {
   // Start the server before tests
-  server = app.listen(0); // Start on a random available port
+  server = app.listen(0,done); // Make sure Jest waits until the server is started
 });
 
 afterAll((done) => {
