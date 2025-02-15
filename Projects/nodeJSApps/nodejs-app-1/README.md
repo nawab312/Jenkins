@@ -8,3 +8,8 @@ In addition to the basic Node.js application, the project integrates a Jenkins p
     Running Tests – Executing unit tests with Jest to ensure the application behaves as expected.
     Build – This is a placeholder step in the Jenkins pipeline (useful if you need to build or package your app).
     Deployment – A placeholder stage where you would add your deployment logic to deploy the application to your desired environment.
+
+* Test Execution: The npm test command runs the Jest testing framework, which looks for any files that have the *.test.js or *.spec.js extension (e.g., test.js in your project).
+* Test Case: The test you’ve written in test/test.js contains an HTTP request to the Express server (GET /) to ensure that it returns the correct message "Hello, Jenkins!".
+* Supertest is used here to simulate making an HTTP request to your Express app without actually starting a server, avoiding issues like the port already being in use.
+* Jest's Role: Jest runs your unit tests and checks if everything is functioning correctly. If any test fails, the pipeline will fail at this stage. If all tests pass, Jenkins continues to the next stage.
