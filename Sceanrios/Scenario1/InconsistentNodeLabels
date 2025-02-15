@@ -1,0 +1,35 @@
+pipeline {
+    agent none  // This makes sure the pipeline does not run on the master node, but will run on slaves.
+
+    stages {
+        stage('Linux Build') {
+            agent {
+                label 'linux'  // This will run the job on any available node with the 'linux' label
+            }
+            steps {
+                echo 'Building on a Linux node...'
+                sh 'echo "Building Linux part of the pipeline"'
+            }
+        }
+        
+        stage('Windows Build') {
+            agent {
+                label 'windows'  // This will run the job on any available node with the 'windows' label
+            }
+            steps {
+                echo 'Building on a Windows node...'
+                bat 'echo "Building Windows part of the pipeline"'
+            }
+        }
+
+        stage('Linux Cleanup') {
+            agent {
+                label 'linux'  // This runs cleanup on a linux node again, can run on any linux node
+            }
+            steps {
+                echo 'Cleaning up on a Linux node...'
+                sh 'echo "Cleaning up Linux part of the pipeline"'
+            }
+        }
+    }
+}
