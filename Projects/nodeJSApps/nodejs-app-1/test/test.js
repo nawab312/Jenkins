@@ -1,17 +1,16 @@
 const request = require('supertest');
-const app = require('../app'); // Assuming app is exported from app.js
-let server;
+const app = require('../index');  // Import the app from index.js
 
-beforeAll((done) => {
-  // Start the server before tests and pass done to wait for server to start
-  server = app.listen(0, () => done());  // Ensure Jest waits for server startup
+let server;  // Declare server variable to manage the lifecycle of the server
+
+beforeAll(() => {
+  // Start the server before running tests
+  server = app.listen(3000);
 });
 
-afterAll(async () => {
-  // Ensure the server is closed after the tests
-  if (server) {
-    await server.close();
-  }
+afterAll(() => {
+  // Close the server after tests are finished
+  server.close();
 });
 
 describe('GET /', () => {
