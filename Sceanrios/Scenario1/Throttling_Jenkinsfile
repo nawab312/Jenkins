@@ -7,7 +7,7 @@ pipeline {
                 label 'linux'  // Runs on any available node with the 'linux' label
             }
             options {
-                throttle([mode: 'all', limit: 2])  // Limit the total number of concurrent builds to 2 across all linux nodes
+                throttle([mode: 'node', limit: 1])  // Limit each node to 1 concurrent build
             }
             steps {
                 echo 'Building on a Linux node...'
