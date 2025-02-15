@@ -10,14 +10,18 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout from Git repository
-                git branch: 'main', url: 'https://github.com/yourusername/yourrepo.git'
+                git branch: 'main', url: 'https://github.com/nawab312/Jenkins.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'npm install'  // Install dependencies from package.json
+                    dir('Projects/nodeJSApps/nodejs-app-1/') {
+                        sh 'pwd'
+                        sh 'ls -lart'
+                        sh 'npm install'  // Install dependencies from package.json
+                    }
                 }
             }
         }
@@ -25,7 +29,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    sh 'npm test'  // Run tests
+                    dir('Projects/nodeJSApps/nodejs-app-1/') {
+                        sh 'npm test -- --detectOpenHandles && exit 0'   // Run tests                    
+                    }
                 }
             }
         }
