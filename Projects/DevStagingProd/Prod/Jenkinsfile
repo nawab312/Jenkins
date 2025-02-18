@@ -1,0 +1,94 @@
+pipeline {
+    agent any
+
+    environment {
+        // Environment variables for S3 bucket and WebLogic details
+        S3_BUCKET = 'your-s3-bucket-name'
+        DEPLOY_SERVER = 'your-production-weblogic-server-ip'
+        DEPLOY_PATH = '/path/to/deploy/directory'
+        MAVEN_HOME = '/opt/maven'
+        ANSIBLE_PLAYBOOK = 'deploy-to-weblogic.yml'
+        INVENTORY_FILE = 'inventory.ini'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Checkout the 'production' branch from GitHub
+                git branch: 'production', url: 'https://github.com/your-org/your-repo.git'
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                script {
+                    // Run Maven build and unit tests for production environment
+                    sh '''#!/bin/bash
+                    ${MAVEN_HOME}/bin/mvn clean install -DskipTests
+                    '''
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                script {
+                    // Run JUnit tests to ensure functionality for production
+                    sh '''#!/bin/bash
+                    ${MAVEN_HOME}/bin/mvn test
+                    '''
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Run SonarQube analysis for static code analysis
+                    sh '''#!/bin/bash
+                    ${MAVEN_HOME}/bin/mvn sonar:sonar -Dsonar.projectKey=your-project-key -Dsonar.host.url=http://your-sonarqube-server
+                    '''
+                }
+            }
+        }
+
+        stage('Store Artifacts in S3') {
+            steps {
+                script {
+                    // Upload the WAR/JAR file to S3 bucket for Production
+                    sh '''#!/bin/bash
+                    aws s3 cp target/your-application.war s3://${S3_BUCKET}/artifacts/your-application-${BUILD_NUMBER}.war
+                    '''
+                }
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                input message: 'Approve deployment to Production?', ok: 'Deploy'
+            }
+        }
+
+        stage('Deploy to WebLogic (Production)') {
+            steps {
+                script {
+                    // Run the Ansible playbook for Production deployment
+                    sh '''#!/bin/bash
+                    ansible-playbook -i ${INVENTORY_FILE} ${ANSIBLE_PLAYBOOK}
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            // Notify on successful deployment to Production
+            echo 'Production deployment successful!'
+        }
+        failure {
+            // Notify on failed deployment to Production
+            echo 'Production deployment failed!'
+        }
+    }
+}
