@@ -1,0 +1,19 @@
+---
+- name: Deploy Application to WebLogic Server
+  hosts: weblogic_servers
+  become: yes
+  vars:
+    deploy_path: "/path/to/deploy/directory"
+    war_file: "/path/to/your/war-file/your-application.war"
+  tasks:
+    - name: Copy WAR file to the WebLogic server
+      ansible.builtin.copy:
+        src: "{{ war_file }}"
+        dest: "{{ deploy_path }}/your-application.war"
+        mode: '0644'
+
+    - name: Run the WebLogic deployment script
+      ansible.builtin.shell:
+        cmd: "cd {{ deploy_path }} && ./deploy-to-weblogic.sh"
+        creates: "{{ deploy_path }}/your-application.war"
+
