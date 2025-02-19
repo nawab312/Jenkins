@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    environment {
+        NODEJS_HOME = tool name: 'NodeJS'
+        PATH = "${NODEJS_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout from Git repository
+                git branch: 'main', url: 'https://github.com/nawab312/Jenkins.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    dir('Projects/nodeJSApps/nodejs-app-1/') {
+                        // Cache node_modules if it exists, else install dependencies
+                        cache(
+                            includes: 'node_modules/**', // Specifies the path to cache
+                            name: 'node-modules-cache' // Cache name
+                        )
+                        sh 'pwd'
+                        sh 'ls -lart'
+                        sh 'npm install'  // Install dependencies from package.json
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    dir('Projects/nodeJSApps/nodejs-app-1/') {
+                        sh 'npm test -- --detectOpenHandles && exit 0'   // Run tests                    
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Build step (if needed)'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the app'
+                // Add your deployment steps here
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up'
+        }
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
