@@ -3,11 +3,15 @@ pipeline {
 
     stages {
         stage('Linux Build') {
-            agent {
-                label 'linux'  // Runs on any available node with the 'linux' label
-            }
+            agent { label 'linux' }  // Runs on a node with 'linux' label
             options {
-                throttle([mode: 'node', limit: 1])  // Limit each node to 1 concurrent build
+                throttleJobProperty(
+                    categories: ['linux-builds'],
+                    maxConcurrentPerNode: 1,  // Only 1 concurrent build per node
+                    maxConcurrentTotal: 2,    // Allow 2 total concurrent builds across all nodes
+                    throttleEnabled: true,
+                    throttleOption: 'project'
+                )
             }
             steps {
                 echo 'Building on a Linux node...'
@@ -16,8 +20,15 @@ pipeline {
         }
 
         stage('Windows Build') {
-            agent {
-                label 'windows'  // Runs only on a node with the 'windows' label
+            agent { label 'windows' }  // Runs on a node with 'windows' label
+            options {
+                throttleJobProperty(
+                    categories: ['windows-builds'],
+                    maxConcurrentPerNode: 1,  // Only 1 concurrent build per node
+                    maxConcurrentTotal: 2,    // Allow 2 total concurrent builds across all nodes
+                    throttleEnabled: true,
+                    throttleOption: 'project'
+                )
             }
             steps {
                 echo 'Building on a Windows node...'
