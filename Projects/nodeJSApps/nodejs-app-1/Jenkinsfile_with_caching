@@ -19,13 +19,13 @@ pipeline {
                 script {
                     dir('Projects/nodeJSApps/nodejs-app-1/') {
                         // Cache node_modules if it exists, else install dependencies
-                        cache(
-                            includes: 'node_modules/**', // Specifies the path to cache
-                            name: 'node-modules-cache' // Cache name
-                        )
-                        sh 'pwd'
-                        sh 'ls -lart'
-                        sh 'npm install'  // Install dependencies from package.json
+                        cache(caches: [
+                            arbitraryFileCache(path: 'node_modules', includes: '**/*')
+                        ]) {
+                            sh 'pwd'
+                            sh 'ls -lart'
+                            sh 'npm install'  // Install dependencies from package.json
+                        }
                     }
                 }
             }
