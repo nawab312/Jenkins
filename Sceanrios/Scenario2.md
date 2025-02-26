@@ -45,6 +45,8 @@ pipeline {
                 script {
                     // Use Docker compose to Spin up InventorService (Or Necessary Services)
                     sh 'docker-compose up -d inventory-service'
+                    // Alternatively, mock InventoryService using WireMock (only if needed)
+                    sh 'docker-compose up -d wiremock'
                 }                
             }
         }
@@ -101,3 +103,11 @@ pipeline {
         }
     }
 }
+```
+
+- **Checkout Stage:** This pulls the latest code from the repository (Git or another source control system).
+- **Build Stage:** In this example, we’re using Maven to build the `OrderService`. The command `mvn clean install` will clean the build and compile the code.
+- **Unit Tests:** Run unit tests to ensure the codebase is correct. This is done via mvn test.
+- **Start Dependency Services:** Here, we use **Docker Compose** to bring up the `InventoryService` as a dependency. This is useful when the service is available for testing. If the `InventoryService` is unavailable, you can mock it using **WireMock** or another mock tool.
+- **Integration Tests:** These tests run the actual integration tests where `OrderService` communicates with `InventoryService`. If `InventoryService` is unavailable, the pipeline continues by mocking the service responses (you can implement mocking using tools like WireMock or mock classes in the codebase).
+- **Stop Dependency Services:** After the tests are complete, the pipeline stops the services (both real and mock) to clean up the environment.
