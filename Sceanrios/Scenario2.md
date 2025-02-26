@@ -4,4 +4,101 @@ Key Points to Consider:
 - Managing dependencies between services.
 - Handling service unavailability during testing.
 - Ensuring reliability and speed of the pipeline.
-- Potential use of mocks or stubs for unavailable services.**
+- Potential use of mocks or stubs for unavailable services.
+
+- You have a microservice called `OrderService` that depends on an external service called `InventoryService`. Sometimes the `InventoryService` is unavailable, so the pipeline should continue but handle service unavailability gracefully by using mock responses.
+- The `OrderService` is a Java-based microservice.
+- The pipeline should run **Unit Tests**, **Integration Tests**, and then deploy to a **staging environment**
+
+```groovy
+pipeline {
+    agent any
+
+    environment {
+        ORDER_SERVICE_NAME = 'OrderService'
+        INVENTORY_SERVICE_NAME = 'Inventory'
+        DEPLOYMENT_ENV = 'staging'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm //Checkout the source code from Git
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    sh 'mvn clean install' //Build the OrderService
+                }                
+            }
+        }
+        stage('Unit Tests') {
+            steps {
+                script {
+                    sh 'mvn test' // Run Unit Tests for the OrderService                   
+                }                
+            }
+        }
+        stage('Start Dependency Service') {
+            steps {
+                script {
+                    // Use Docker compose to Spin up InventorService (Or Necessary Services)
+                    sh 'docker-compose up -d inventory-service'
+                }                
+            }
+        }
+        stage('Integration Tests') {
+            steps {
+                script {
+                    // Check if Inventory Service is Running
+                    try {
+                        sh 'mvn verify' // Run Integration Test
+                    } catch(Exception e) {
+                        // If the InventoryService is Down Mock the Response
+                        echo 'InventoryService is unavailable. Running tests with mock responses.'
+
+                        // Here, you can use a mocking library like WireMock
+                        // Simulate InventoryService responses in the tests
+                        sh 'mvn -DmockInventoryService=true verify'
+                    }
+                }
+            }
+        }
+        stage('Stop Dependency Services') {
+            steps {
+                script {
+                    sh 'docket-compose down'
+                }
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                script {
+                    sh './deploy-to-staging.sh'
+                }
+            }
+        }
+        stage('Noitfy') {
+            steps {
+                script {
+                    echo 'Sending Notification'
+                    slackSend channel: '#devops', message: "Deployment finished for ${ORDER_SERVICE_NAME}"
+                }
+            }
+        }
+        
+        post {
+            always {
+                cleanWs() //Cleaning up the Workspace
+            }
+            success {
+                echo 'Pipeline successfully completed'
+            }
+            failure {
+                echo 'Pipeline failed'
+            }
+        }
+    }
+}
+```.
